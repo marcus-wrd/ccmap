@@ -230,7 +230,7 @@
                     {
                         selector: 'node',
                         style: {
-                            'shape': 'rectangle',
+                            'shape': 'round-rectangle',
                             'background-color': 'data(color)', // dynamic color
                             'label': 'data(label)',
                             'text-wrap': 'wrap',
@@ -249,15 +249,14 @@
                             'line-color': 'data(color)',  // dynamic color for edge
                             'target-arrow-color': 'data(color)',  // dynamic color for arrow
                             'target-arrow-shape': 'triangle',
-                            'curve-style': 'taxi'
+                            'curve-style': 'bezier'
                         }
                     }
                 ],
             layout: {
-                name: 'breadthfirst',
+                name: 'dagre',
                 fit: true,
-                directed: true,
-                padding: 5,
+                padding: 12,
                 spacingFactor: 1.3  // Adjust this value to find the desired edge length
             }
             });
