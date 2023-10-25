@@ -258,6 +258,7 @@
                 var png64 = cy.png({output: 'base64'});
                 var link = document.createElement('a');
                 link.download = "data:image/png;base64," + png64;
+                link.href = "data:image/png;base64," + png64;
                 link.click();
             });
         }
