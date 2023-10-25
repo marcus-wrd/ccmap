@@ -139,7 +139,7 @@
                 textarea.style.height = '90px'; // After 5 lines, restrict to 90px
             }
         }
-
+        let cy = null; // global cy variable
         async function sendMessage() {
             const inputElement = document.getElementById('input-message');
             const message = inputElement.value;
@@ -209,7 +209,7 @@
             }
 
 
-            const cy = cytoscape({
+            cy = cytoscape({
                 container: cyContainer,
                 elements: graphData,
                 style: [
@@ -259,25 +259,21 @@
 
             // New function to add manual nodes
             function addManualNode() {
-                const cyContainer = document.getElementById('chat-messages').lastElementChild;
                 const nodeId = prompt("Enter a unique node ID:", "Edit me by double-clicking...");
-                
-                if (nodeId) {
-                    cyContainer.cy().add({
+                if (nodeId && cy) {
+                    cy.add({
                         group: 'nodes',
                         data: { id: nodeId, color: '#FF5733' }
                     });
                 }
             }
-    
+            
             // New function to add manual edges
             function addManualEdge() {
-                const cyContainer = document.getElementById('chat-messages').lastElementChild;
                 const sourceNode = prompt("Enter the source node ID:");
                 const targetNode = prompt("Enter the target node ID:");
-    
-                if (sourceNode && targetNode) {
-                    cyContainer.cy().add({
+                if (sourceNode && targetNode && cy) {
+                    cy.add({
                         group: 'edges',
                         data: {
                             id: sourceNode + "->" + targetNode,
@@ -288,6 +284,7 @@
                     });
                 }
             }
+
             document.getElementById('addManualEdge').addEventListener('click', addManualEdge)
             document.getElementById('addManualNode').addEventListener('click', addManualNode)
             // Modified the dblclick event to fix the node label editing issue
