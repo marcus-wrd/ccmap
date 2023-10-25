@@ -164,6 +164,12 @@
             });
 
             const graphData = await response.json();
+            for (let node of graphData.nodes) {
+                if (!node.data.label) {
+                    node.data.label = node.data.id;
+                }
+            }
+
             // A recursive function to color nodes and their descendants
             function colorDescendants(nodeId, color, edges, nodes, nodeColorMapping) {
                 // Find all edges where this node is the source
@@ -218,7 +224,7 @@
                         style: {
                             'shape': 'rectangle',
                             'background-color': 'data(color)', // dynamic color
-                            'label': 'data(id)',
+                            'label': 'data(label)',
                             'text-wrap': 'wrap',
                             'text-max-width': '150px',
                             'font-size': '18.5px',
@@ -263,7 +269,7 @@
                 if (nodeId && cy) {
                     cy.add({
                         group: 'nodes',
-                        data: { id: nodeId, color: '#FF5733' }
+                        data: { id: nodeId, label: nodeId, color: '#FF5733' }
                     });
                 }
             }
@@ -288,16 +294,16 @@
             document.getElementById('addManualEdge').addEventListener('click', addManualEdge)
             document.getElementById('addManualNode').addEventListener('click', addManualNode)
             // Modified the dblclick event to fix the node label editing issue
-            cy.on('dblclick', 'node', function(event){
+            cy.on('dblclick', 'node', function(event) {
                 const node = event.target;
-                const oldLabel = node.data('label');
+                const oldLabel = node.data('label');  // changed from id to label
                 const newLabel = prompt("Edit node label:", oldLabel);
-                
                 if (newLabel && newLabel !== oldLabel) {
                     node.data('label', newLabel);
                     node.style({ 'width': 'label', 'height': 'label' });
                 }
             });
+
 
             // Function to handle PNG export
             document.getElementById('save-as-png').addEventListener('click', function() {
