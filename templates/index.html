@@ -161,7 +161,25 @@
             });
 
             const graphData = await response.json();
-            // Existing code
+            // A recursive function to color nodes and their descendants
+            function colorDescendants(nodeId, color, edges, nodes, nodeColorMapping) {
+                // Find all edges where this node is the source
+                let childEdges = edges.filter(edge => edge.data.source === nodeId);
+                
+                for (let edge of childEdges) {
+                    edge.data.color = color; // Color the edge
+                    
+                    let targetNode = nodes.find(node => node.data.id === edge.data.target);
+                    targetNode.data.color = color; // Color the target node
+                    
+                    nodeColorMapping[targetNode.data.id] = color; // Store color mapping
+                    
+                    // Recursively color the descendants of the target node
+                    colorDescendants(targetNode.data.id, color, edges, nodes, nodeColorMapping);
+                }
+            }
+            
+            // In your sendMessage function:
             let parentNode = graphData.nodes[0]; // Assuming the 1st node is the main node
             const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33FF", "#FF8333"]; // Example colors
             
@@ -171,21 +189,22 @@
             for (let i = 0; i < graphData.edges.length; i++) {
                 let edge = graphData.edges[i];
             
+                // If this edge starts at the parent node
                 if (edge.data.source === parentNode.data.id) {
-                    let targetNode = graphData.nodes.find(node => node.data.id === edge.data.target);
-                    let color = colors[i % colors.length]; // Use modulo to loop through colors if there are more edges than colors
+                    let color = colors[i % colors.length];
+                    
+                    // Color the edge and target node
                     edge.data.color = color;
-                    targetNode.data.color = color;
-            
-                    nodeColorMapping[targetNode.data.id] = color; // Store color mapping
-                } else if (nodeColorMapping[edge.data.source]) { // Check if the source node has a color assigned
-                    edge.data.color = nodeColorMapping[edge.data.source];
                     let targetNode = graphData.nodes.find(node => node.data.id === edge.data.target);
-                    targetNode.data.color = nodeColorMapping[edge.data.source];
-                } else {
-                    edge.data.color = "#FFFFFF"; // Default color, can be adjusted
+                    targetNode.data.color = color;
+                    
+                    nodeColorMapping[targetNode.data.id] = color; // Store color mapping
+                    
+                    // Recursively color the descendants of this target node
+                    colorDescendants(targetNode.data.id, color, graphData.edges, graphData.nodes, nodeColorMapping);
                 }
             }
+
 
             const cy = cytoscape({
                 container: cyContainer,
@@ -238,7 +257,7 @@
             document.getElementById('save-as-png').addEventListener('click', function() {
                 var png64 = cy.png({output: 'base64'});
                 var link = document.createElement('a');
-                link.href = png64;
+                link.download = "data:image/png;base64," + png64;
                 link.click();
             });
         }
