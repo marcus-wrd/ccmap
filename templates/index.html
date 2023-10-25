@@ -125,6 +125,8 @@
         </div>
     </div>
     <button id="save-as-png">Save as PNG</button>
+    <button id="add-node">Add Node</button>
+    <button id="add-edge">Add Edge</button>
     <script>
         // Function to resize textarea
         function resizeTextarea() {
@@ -215,7 +217,7 @@
                         style: {
                             'shape': 'rectangle',
                             'background-color': 'data(color)', // dynamic color
-                            'label': 'data(id)',
+                            'label': 'data(label)',
                             'text-wrap': 'wrap',
                             'text-max-width': '150px',
                             'font-size': '18.5px',
@@ -255,11 +257,11 @@
             
             cy.on('dblclick', 'node', function(event){
                 const node = event.target;
-                const oldLabel = node.data('id');
+                const oldLabel = node.data('label');  // Use label data
                 const newLabel = prompt("Edit node label:", oldLabel);
                 
                 if (newLabel && newLabel !== oldLabel) {
-                    node.data('id', newLabel);
+                    node.data('label', newLabel);  // Update label data
                     node.style({ 'width': 'label', 'height': 'label' });
                 }
             });
@@ -271,6 +273,35 @@
                 link.download = "data:image/png;base64," + png64;
                 link.href = "data:image/png;base64," + png64;
                 link.click();
+            });
+            let nodeIdCounter = 0;  // A counter to give unique IDs to nodes
+            
+            // Add node
+            document.getElementById('add-node').addEventListener('click', function() {
+                const newNodeLabel = "Edit me by double-clicking...";
+                cy.add({
+                    group: 'nodes',
+                    data: { id: 'n' + nodeIdCounter++, label: newNodeLabel, color: "#FFF" }
+                });
+            });
+            
+            // Add edge
+            document.getElementById('add-edge').addEventListener('click', function() {
+                const sourceLabel = prompt("Enter source node label:");
+                const targetLabel = prompt("Enter target node label:");
+                
+                if (sourceLabel && targetLabel) {
+                    const sourceNode = cy.nodes().filter(`[label = "${sourceLabel}"]`);
+                    const targetNode = cy.nodes().filter(`[label = "${targetLabel}"]`);
+                    if (sourceNode.length && targetNode.length) {
+                        cy.add({
+                            group: 'edges',
+                            data: { source: sourceNode.data('id'), target: targetNode.data('id'), color: "#FFF" }
+                        });
+                    } else {
+                        alert("One or both nodes do not exist!");
+                    }
+                }
             });
 
         }
