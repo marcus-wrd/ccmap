@@ -124,9 +124,10 @@
             <button id="send-button" onclick="sendMessage()"><i class="fa-regular fa-paper-plane"></i></button>
         </div>
     </div>
-    <button id="create-node">Create Node</button>
-    <button id="create-edge">Create Edge</button>
     <button id="save-as-png">Save as PNG</button>
+    <!-- Added buttons for manual addition of nodes and edges -->
+    <button onclick="addManualNode()">Add Manual Node</button>
+    <button onclick="addManualEdge()">Add Manual Edge</button>
     <script>
         // Function to resize textarea
         function resizeTextarea() {
@@ -138,50 +139,6 @@
                 textarea.style.height = '90px'; // After 5 lines, restrict to 90px
             }
         }
-        
-        let cy;
-        let nodeCount = 0;
-
-        // Function to create new node
-        function createNode() {
-            const id = `NewNode${++nodeCount}`;
-            const node = {
-                data: { id: id, color: '#FF5733' },
-                position: { x: window.innerWidth / 2, y: window.innerHeight / 2 }
-            };
-
-            cy.add(node);
-            const addedNode = cy.getElementById(id);
-            addedNode.data('id', "Edit me by double-clicking...");
-            addedNode.style({ 'width': 'label', 'height': 'label' });
-        }
-
-        // Function to create new edge
-        function createEdge() {
-            const sourceNode = prompt("Enter the source node label:");
-            const targetNode = prompt("Enter the target node label:");
-
-            if (!sourceNode || !targetNode) return;
-            if (!cy.getElementById(sourceNode).length || !cy.getElementById(targetNode).length) {
-                alert("Invalid source or target node.");
-                return;
-            }
-
-            const edge = {
-                data: {
-                    source: sourceNode,
-                    target: targetNode,
-                    color: "#FF5733" // Default color for the edge, you can change this
-                }
-            };
-
-            cy.add(edge);
-        }
-
-        // Event listeners for the new buttons
-        document.getElementById('create-node').addEventListener('click', createNode);
-        document.getElementById('create-edge').addEventListener('click', createEdge);
-
 
         async function sendMessage() {
             const inputElement = document.getElementById('input-message');
@@ -299,6 +256,40 @@
                 event.target.removeClass('grabbing');
             });
             
+
+            // New function to add manual nodes
+            function addManualNode() {
+                const cyContainer = document.getElementById('chat-messages').lastElementChild;
+                const nodeId = prompt("Enter a unique node ID:", "Edit me by double-clicking...");
+                
+                if (nodeId) {
+                    cyContainer.cy().add({
+                        group: 'nodes',
+                        data: { id: nodeId, color: '#FF5733' }
+                    });
+                }
+            }
+    
+            // New function to add manual edges
+            function addManualEdge() {
+                const cyContainer = document.getElementById('chat-messages').lastElementChild;
+                const sourceNode = prompt("Enter the source node ID:");
+                const targetNode = prompt("Enter the target node ID:");
+    
+                if (sourceNode && targetNode) {
+                    cyContainer.cy().add({
+                        group: 'edges',
+                        data: {
+                            id: sourceNode + "->" + targetNode,
+                            source: sourceNode,
+                            target: targetNode,
+                            color: '#FF5733'
+                        }
+                    });
+                }
+            }
+    
+            // Modified the dblclick event to fix the node label editing issue
             cy.on('dblclick', 'node', function(event){
                 const node = event.target;
                 const oldLabel = node.data('id');
