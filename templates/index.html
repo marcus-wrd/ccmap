@@ -113,6 +113,10 @@
             border-radius: 5px;
             font-size: 16px;
         }
+        /* Add these lines inside the <style> section */
+        .fas {
+            font-size: 1.2em;
+        }
     </style>
 </head>
 
@@ -124,10 +128,14 @@
             <button id="send-button" onclick="sendMessage()"><i class="fa-regular fa-paper-plane"></i></button>
         </div>
     </div>
-    <button id="save-as-png">Save as PNG</button>
-    <!-- Added buttons for manual addition of nodes and edges -->
-    <button id="addManualNode">Add Manual Node</button>
-    <button id="addManualEdge">Add Manual Edge</button>
+    <!-- Save as PNG button -->
+    <button id="save-as-png"><i class="fas fa-image"></i></button>
+    <!-- Add Manual Node button -->
+    <button id="addManualNode"><i class="fas fa-plus-square"></i></button>
+    <!-- Add Manual Remove Node button -->
+    <button id="removeNode"><i class="fas fa-trash"></i></button>
+    <!-- Add Manual Edge button -->
+    <button id="addManualEdge"><i class="fas fa-link"></i></button>
     <script>
         // Function to resize textarea
         function resizeTextarea() {
@@ -290,7 +298,19 @@
                     });
                 }
             }
-
+            
+            function removeSelectedNode() {
+                if (cy) {
+                    const selectedNode = cy.$('node:selected');
+                    if (selectedNode.length) {
+                        selectedNode.connectedEdges().remove();
+                        selectedNode.remove();
+                    } else {
+                        alert("Select a node first to remove it!");
+                    }
+                }
+            }
+            document.getElementById('removeNode').addEventListener('click', removeSelectedNode);
             document.getElementById('addManualEdge').addEventListener('click', addManualEdge)
             document.getElementById('addManualNode').addEventListener('click', addManualNode)
             // Modified the dblclick event to fix the node label editing issue
