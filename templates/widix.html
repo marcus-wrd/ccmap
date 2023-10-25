@@ -103,7 +103,7 @@
             border-radius: 5px;
             background-color: #465c71;
         }
-        #save-as-png {
+        button {
             margin-top: 20px;
             padding: 10px 20px;
             cursor: pointer;
@@ -112,6 +112,10 @@
             border: none;
             border-radius: 5px;
             font-size: 16px;
+        }
+        /* Add these lines inside the <style> section */
+        .fas {
+            font-size: 1.2em;
         }
     </style>
 </head>
@@ -124,7 +128,14 @@
             <button id="send-button" onclick="sendMessage()"><i class="fa-regular fa-paper-plane"></i></button>
         </div>
     </div>
-    <button id="save-as-png">Save as PNG</button>
+    <!-- Save as PNG button -->
+    <button id="save-as-png"><i class="fas fa-image"></i></button>
+    <!-- Add Manual Node button -->
+    <button id="addManualNode"><i class="fas fa-plus-square"></i></button>
+    <!-- Add Manual Remove Node button -->
+    <button id="removeNode"><i class="fas fa-trash"></i></button>
+    <!-- Add Manual Edge button -->
+    <button id="addManualEdge"><i class="fas fa-link"></i></button>
     <script>
         // Function to resize textarea
         function resizeTextarea() {
@@ -136,7 +147,7 @@
                 textarea.style.height = '90px'; // After 5 lines, restrict to 90px
             }
         }
-
+        let cy = null; // global cy variable
         async function sendMessage() {
             const inputElement = document.getElementById('input-message');
             const message = inputElement.value;
@@ -161,6 +172,12 @@
             });
 
             const graphData = await response.json();
+            for (let node of graphData.nodes) {
+                if (!node.data.label) {
+                    node.data.label = node.data.id;
+                }
+            }
+
             // A recursive function to color nodes and their descendants
             function colorDescendants(nodeId, color, edges, nodes, nodeColorMapping) {
                 // Find all edges where this node is the source
@@ -206,7 +223,7 @@
             }
 
 
-            const cy = cytoscape({
+            cy = cytoscape({
                 container: cyContainer,
                 elements: graphData,
                 style: [
@@ -215,10 +232,10 @@
                         style: {
                             'shape': 'rectangle',
                             'background-color': 'data(color)', // dynamic color
-                            'label': 'data(id)',
+                            'label': 'data(label)',
                             'text-wrap': 'wrap',
                             'text-max-width': '150px',
-                            'font-size': '18.5px',
+                            'font-size': '15.5px',
                             'text-valign': 'center',
                             'width': 'label',
                             'height': 'label',
@@ -240,8 +257,8 @@
                 name: 'breadthfirst',
                 fit: true,
                 directed: true,
-                padding: 8,
-                spacingFactor: 0.7625  // Adjust this value to find the desired edge length
+                padding: 5,
+                spacingFactor: 1  // Adjust this value to find the desired edge length
             }
             });
 
@@ -253,16 +270,60 @@
                 event.target.removeClass('grabbing');
             });
             
-            cy.on('dblclick', 'node', function(event){
+
+            // New function to add manual nodes
+            function addManualNode() {
+                const nodeId = prompt("Enter a unique node ID:", "Edit me by double-clicking...");
+                if (nodeId && cy) {
+                    cy.add({
+                        group: 'nodes',
+                        data: { id: nodeId, label: nodeId, color: '#FF5733' }
+                    });
+                }
+            }
+            
+            // New function to add manual edges
+            function addManualEdge() {
+                const sourceNode = prompt("Enter the source node ID:");
+                const targetNode = prompt("Enter the target node ID:");
+                if (sourceNode && targetNode && cy) {
+                    cy.add({
+                        group: 'edges',
+                        data: {
+                            id: sourceNode + "->" + targetNode,
+                            source: sourceNode,
+                            target: targetNode,
+                            color: '#FF5733'
+                        }
+                    });
+                }
+            }
+            
+            function removeSelectedNode() {
+                if (cy) {
+                    const selectedNode = cy.$('node:selected');
+                    if (selectedNode.length) {
+                        selectedNode.connectedEdges().remove();
+                        selectedNode.remove();
+                    } else {
+                        alert("Select a node first to remove it!");
+                    }
+                }
+            }
+            document.getElementById('removeNode').addEventListener('click', removeSelectedNode);
+            document.getElementById('addManualEdge').addEventListener('click', addManualEdge)
+            document.getElementById('addManualNode').addEventListener('click', addManualNode)
+            // Modified the dblclick event to fix the node label editing issue
+            cy.on('dblclick', 'node', function(event) {
                 const node = event.target;
-                const oldLabel = node.data('id');
+                const oldLabel = node.data('label');  // changed from id to label
                 const newLabel = prompt("Edit node label:", oldLabel);
-                
                 if (newLabel && newLabel !== oldLabel) {
-                    node.data('id', newLabel);
+                    node.data('label', newLabel);
                     node.style({ 'width': 'label', 'height': 'label' });
                 }
             });
+
 
             // Function to handle PNG export
             document.getElementById('save-as-png').addEventListener('click', function() {
