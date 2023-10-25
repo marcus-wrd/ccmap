@@ -161,9 +161,9 @@
                             'shape': 'rectangle',
                             'background-color': 'data(color)', // dynamic color
                             'label': 'data(id)',
-                            'text-wrap': 'ellipsis',
+                            'text-wrap': 'wrap',
                             'text-max-width': '150px',
-                            'font-size': '10.5px',
+                            'font-size': '18.5px',
                             'text-valign': 'center',
                             'width': 'label',
                             'height': 'label',
@@ -182,11 +182,12 @@
                     }
                 ],
                 layout: {
-                    name: 'breadthfirst',
+                    name: 'cose',
                     fit: true,
-                    directed: true,
                     padding: 10,
-                    spacingFactor: 0.5
+                    animate: false,  // Turn off for large graphs for better performance
+                    nodeOverlap: 5,
+                    idealEdgeLength: 30  // Adjust to control edge lengths
                 }
             });
 
