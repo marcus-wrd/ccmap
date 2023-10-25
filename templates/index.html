@@ -96,12 +96,19 @@
             width: 100%;
             height: 50vh;
         }
+        .cy-container {
+            width: 90%;
+            height: 50vh;
+            margin: 10px auto;
+            border-radius: 5px;
+            background-color: #465c71;
+        }
     </style>
 </head>
 
 <body>
     <div id="chat-container">
-        <div id="chat-messages"><div id="cy"></div></div>
+        <div id="chat-messages"></div>
         <div id="input-container">
             <textarea id="input-message" placeholder="Type a message..." oninput="resizeTextarea()"></textarea>
             <button id="send-button" onclick="sendMessage()"><i class="fa-regular fa-paper-plane"></i></button>
@@ -118,6 +125,7 @@
                 textarea.style.height = '90px'; // After 5 lines, restrict to 90px
             }
         }
+
         async function sendMessage() {
             const inputElement = document.getElementById('input-message');
             const message = inputElement.value;
@@ -127,6 +135,10 @@
             // Display the user's message
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML += `<div class="message">User: ${message2}</div>`;
+            
+            const cyContainer = document.createElement('div');
+            cyContainer.className = 'cy-container';
+            chatMessages.appendChild(cyContainer);
 
             // Fetch data from the backend
             const response = await fetch('/generate', {
@@ -139,31 +151,31 @@
 
             const graphData = await response.json();
 
-            // Render the concept map using Cytoscape.js
             const cy = cytoscape({
-                container: document.getElementById('cy'),
+                container: cyContainer,
                 elements: graphData,
                 style: [
                     {
                         selector: 'node',
                         style: {
                             'shape': 'rectangle',
-                            'background-color': '#666',
+                            'background-color': 'data(color)', // dynamic color
                             'label': 'data(id)',
                             'text-wrap': 'wrap',
                             'text-max-width': '23ch',
-                            'font-size': '60px',
-                            'text-valign': 'center',  // Vertically center the text
-                            'width': 'label',   // Width based on label (can set specific value if needed)
-                            'height': 'label'   // Height based on label (can set specific value if needed)
+                            'font-size': '10.5px',
+                            'text-valign': 'center',
+                            'width': 'label',
+                            'height': 'label',
+                            'padding': '10px'
                         }
                     },
                     {
                         selector: 'edge',
                         style: {
-                            'width': 3,
-                            'line-color': '#ccc',
-                            'target-arrow-color': '#ccc',
+                            'width': 2,
+                            'line-color': 'data(color)',  // dynamic color
+                            'target-arrow-color': 'data(color)',  // dynamic color
                             'target-arrow-shape': 'triangle',
                             'curve-style': 'bezier'
                         }
@@ -177,7 +189,6 @@
                 }
             });
 
-            // Enable drag and drop functionality
             cy.on('grab', 'node', function (event) {
                 event.target.addClass('grabbing');
             });
