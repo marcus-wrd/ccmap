@@ -103,6 +103,16 @@
             border-radius: 5px;
             background-color: #465c71;
         }
+        #save-as-png {
+            margin-top: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
     </style>
 </head>
 
@@ -114,6 +124,7 @@
             <button id="send-button" onclick="sendMessage()"><i class="fa-regular fa-paper-plane"></i></button>
         </div>
     </div>
+    <button id="save-as-png">Save as PNG</button>
     <script>
         // Function to resize textarea
         function resizeTextarea() {
@@ -150,6 +161,20 @@
             });
 
             const graphData = await response.json();
+            // Assign colors to nodes branching from the 1st node
+            let parentNode = graphData.nodes[0]; // Assuming the 1st node is the main node
+            const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33FF", "#FF8333"]; // Example colors
+            for (let i = 0; i < graphData.edges.length; i++) {
+                let edge = graphData.edges[i];
+                if (edge.data.source === parentNode.data.id) {
+                    let targetNode = graphData.nodes.find(node => node.data.id === edge.data.target);
+                    let color = colors[i % colors.length]; // Use modulo to loop through colors if there are more edges than colors
+                    edge.data.color = color;
+                    targetNode.data.color = color;
+                } else {
+                    edge.data.color = "#FFFFFF"; // Default color, can be adjusted
+                }
+            }
 
             const cy = cytoscape({
                 container: cyContainer,
@@ -197,8 +222,17 @@
             cy.on('free', 'node', function (event) {
                 event.target.removeClass('grabbing');
             });
+            
+            // Function to handle PNG export
+            document.getElementById('save-as-png').addEventListener('click', function() {
+                var png64 = cy.png({output: 'base64'});
+                var link = document.createElement('a');
+                link.href = png64;
+                link.download = 'graph.png';
+                link.click();
+            });
         }
-
+        
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("static/generate-sw.js");
         }
