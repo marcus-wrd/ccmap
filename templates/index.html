@@ -161,8 +161,8 @@
                             'shape': 'rectangle',
                             'background-color': 'data(color)', // dynamic color
                             'label': 'data(id)',
-                            'text-wrap': 'wrap',
-                            'text-max-width': '23ch',  // set wrap limit to 23 characters
+                            'text-wrap': 'ellipsis',
+                            'text-max-width': '150px',
                             'font-size': '10.5px',
                             'text-valign': 'center',
                             'width': 'label',
@@ -185,7 +185,8 @@
                     name: 'breadthfirst',
                     fit: true,
                     directed: true,
-                    padding: 10
+                    padding: 10,
+                    spacingFactor: 0.5
                 }
             });
 
