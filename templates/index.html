@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -125,8 +124,8 @@
             <button id="send-button" onclick="sendMessage()"><i class="fa-regular fa-paper-plane"></i></button>
         </div>
     </div>
-    <button onclick="addManualNode()">Add Node</button>
-    <button onclick="addManualEdge()">Add Edge</button>
+    <button id="create-node">Create Node</button>
+    <button id="create-edge">Create Edge</button>
     <button id="save-as-png">Save as PNG</button>
     <script>
         // Function to resize textarea
@@ -139,6 +138,50 @@
                 textarea.style.height = '90px'; // After 5 lines, restrict to 90px
             }
         }
+        
+        let cy;
+        let nodeCount = 0;
+
+        // Function to create new node
+        function createNode() {
+            const id = `NewNode${++nodeCount}`;
+            const node = {
+                data: { id: id, color: '#FF5733' },
+                position: { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+            };
+
+            cy.add(node);
+            const addedNode = cy.getElementById(id);
+            addedNode.data('id', "Edit me by double-clicking...");
+            addedNode.style({ 'width': 'label', 'height': 'label' });
+        }
+
+        // Function to create new edge
+        function createEdge() {
+            const sourceNode = prompt("Enter the source node label:");
+            const targetNode = prompt("Enter the target node label:");
+
+            if (!sourceNode || !targetNode) return;
+            if (!cy.getElementById(sourceNode).length || !cy.getElementById(targetNode).length) {
+                alert("Invalid source or target node.");
+                return;
+            }
+
+            const edge = {
+                data: {
+                    source: sourceNode,
+                    target: targetNode,
+                    color: "#FF5733" // Default color for the edge, you can change this
+                }
+            };
+
+            cy.add(edge);
+        }
+
+        // Event listeners for the new buttons
+        document.getElementById('create-node').addEventListener('click', createNode);
+        document.getElementById('create-edge').addEventListener('click', createEdge);
+
 
         async function sendMessage() {
             const inputElement = document.getElementById('input-message');
@@ -218,7 +261,7 @@
                         style: {
                             'shape': 'rectangle',
                             'background-color': 'data(color)', // dynamic color
-                            'label': 'data(label)',
+                            'label': 'data(id)',
                             'text-wrap': 'wrap',
                             'text-max-width': '150px',
                             'font-size': '18.5px',
@@ -258,15 +301,14 @@
             
             cy.on('dblclick', 'node', function(event){
                 const node = event.target;
-                const oldLabel = node.data('label');  // Update this line
+                const oldLabel = node.data('id');
                 const newLabel = prompt("Edit node label:", oldLabel);
                 
                 if (newLabel && newLabel !== oldLabel) {
-                    node.data('label', newLabel);  // And this line
+                    node.data('id', newLabel);
                     node.style({ 'width': 'label', 'height': 'label' });
                 }
             });
-
 
             // Function to handle PNG export
             document.getElementById('save-as-png').addEventListener('click', function() {
@@ -277,37 +319,6 @@
                 link.click();
             });
 
-            let manualNodeId = 0;
-            
-            function addManualNode() {
-                const newLabel = "Edit me by double-clicking...";
-                const newNode = {
-                    group: "nodes",
-                    data: { id: `manual_${manualNodeId++}`, label: newLabel, color: "#2ecc71" } 
-                };
-                cy.add(newNode);
-            }
-            
-            function addManualEdge() {
-                const sourceNode = prompt("Enter source node label:");
-                const targetNode = prompt("Enter target node label:");
-            
-                if (sourceNode && targetNode) {
-                    const source = cy.nodes().filter(n => n.data('label') === sourceNode).first();
-                    const target = cy.nodes().filter(n => n.data('label') === targetNode).first();
-            
-                    if (source && target) {
-                        const newEdge = {
-                            group: "edges",
-                            data: { source: source.id(), target: target.id(), color: "#2ecc71" }
-                        };
-                        cy.add(newEdge);
-                    } else {
-                        alert("Invalid source or target node.");
-                    }
-                }
-            }
-            
         }
         
         if ("serviceWorker" in navigator) {
