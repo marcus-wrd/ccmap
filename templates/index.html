@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="static/manifest.webmanifest" crossorigin="use-credentials" />
     <script src="https://kit.fontawesome.com/5b96244ab9.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/cytoscape@latest/cytoscape.min.js"></script>
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -124,47 +125,52 @@
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML += `<div class="message">User: ${message2}</div>`;
 
-            // Display loading message with typewriter effect
-            let loadingMessage = 'Nexa: Loading';
-            const loadingElement = document.createElement('div');
-            loadingElement.className = 'message';
-            chatMessages.appendChild(loadingElement);
-
-            for (let i = 0; i < 4; i++) {
-                loadingElement.innerHTML = `${loadingMessage}${'.'.repeat(i)}`;
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-            loadingElement.innerHTML += " (About to fetch!)"
-            // Send the message to the server and get the response
+            // Fetch data from the backend
             const response = await fetch('/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ prompt: `${message}` })
+                body: JSON.stringify({ prompt: message })
             });
-            const data = await response.json();
 
-            // Remove loading message
-            loadingElement.remove();
+            const graphData = await response.json();
 
-            // Display nexa's response with a typing effect
-            let output = '';
-            const responseElement = document.createElement('div');
-            responseElement.className = 'message';
-            chatMessages.appendChild(responseElement);
+            // Render the concept map using Cytoscape.js
+            const cy = cytoscape({
+                container: document.getElementById('cy'), // container to render in
+                elements: graphData,
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': '#666',
+                            'label': 'data(id)'
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        style: {
+                            'width': 3,
+                            'line-color': '#ccc',
+                            'target-arrow-color': '#ccc',
+                            'target-arrow-shape': 'triangle',
+                            'curve-style': 'bezier'
+                        }
+                    }
+                ]
+            });
 
-            dataoutput = data.output.replace(/(?:\r\n|\r|\n)/g, ' <br> ');
-            
-            // Split the output into words
-            const words = dataoutput.split(' ');
+            // Enable drag and drop functionality
+            cy.on('grab', 'node', function (event) {
+                event.target.addClass('grabbing');
+            });
 
-            for (const word of words) {
-                output += word + ' ';
-                responseElement.innerHTML = `Nexa: ${output}`;
-                await new Promise(resolve => setTimeout(resolve, 1000/words.length)); // Adjust delay as needed
-            }
+            cy.on('free', 'node', function (event) {
+                event.target.removeClass('grabbing');
+            });
         }
+
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("static/generate-sw.js");
         }
