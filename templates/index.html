@@ -253,6 +253,17 @@
                 event.target.removeClass('grabbing');
             });
             
+            cy.on('dblclick', 'node', function(event){
+                const node = event.target;
+                const oldLabel = node.data('id');
+                const newLabel = prompt("Edit node label:", oldLabel);
+                
+                if (newLabel && newLabel !== oldLabel) {
+                    node.data('id', newLabel);
+                    node.style({ 'width': 'label', 'height': 'label' });
+                }
+            });
+
             // Function to handle PNG export
             document.getElementById('save-as-png').addEventListener('click', function() {
                 var png64 = cy.png({output: 'base64', scale: 3});  // Increasing the scale to 3 times the original size
