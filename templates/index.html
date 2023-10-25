@@ -255,12 +255,13 @@
             
             // Function to handle PNG export
             document.getElementById('save-as-png').addEventListener('click', function() {
-                var png64 = cy.png({output: 'base64'});
+                var png64 = cy.png({output: 'base64', scale: 3});  // Increasing the scale to 3 times the original size
                 var link = document.createElement('a');
                 link.download = "data:image/png;base64," + png64;
                 link.href = "data:image/png;base64," + png64;
                 link.click();
             });
+
         }
         
         if ("serviceWorker" in navigator) {
