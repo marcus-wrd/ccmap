@@ -161,16 +161,27 @@
             });
 
             const graphData = await response.json();
-            // Assign colors to nodes branching from the 1st node
+            // Existing code
             let parentNode = graphData.nodes[0]; // Assuming the 1st node is the main node
             const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33FF", "#FF8333"]; // Example colors
+            
+            // Dictionary to store node-color mappings
+            let nodeColorMapping = {};
+            
             for (let i = 0; i < graphData.edges.length; i++) {
                 let edge = graphData.edges[i];
+            
                 if (edge.data.source === parentNode.data.id) {
                     let targetNode = graphData.nodes.find(node => node.data.id === edge.data.target);
                     let color = colors[i % colors.length]; // Use modulo to loop through colors if there are more edges than colors
                     edge.data.color = color;
                     targetNode.data.color = color;
+            
+                    nodeColorMapping[targetNode.data.id] = color; // Store color mapping
+                } else if (nodeColorMapping[edge.data.source]) { // Check if the source node has a color assigned
+                    edge.data.color = nodeColorMapping[edge.data.source];
+                    let targetNode = graphData.nodes.find(node => node.data.id === edge.data.target);
+                    targetNode.data.color = nodeColorMapping[edge.data.source];
                 } else {
                     edge.data.color = "#FFFFFF"; // Default color, can be adjusted
                 }
@@ -228,7 +239,6 @@
                 var png64 = cy.png({output: 'base64'});
                 var link = document.createElement('a');
                 link.href = png64;
-                link.download = 'graph.png';
                 link.click();
             });
         }
