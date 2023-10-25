@@ -290,11 +290,11 @@
             // Modified the dblclick event to fix the node label editing issue
             cy.on('dblclick', 'node', function(event){
                 const node = event.target;
-                const oldLabel = node.data('id');
+                const oldLabel = node.data('label');
                 const newLabel = prompt("Edit node label:", oldLabel);
                 
                 if (newLabel && newLabel !== oldLabel) {
-                    node.data('id', newLabel);
+                    node.data('label', newLabel);
                     node.style({ 'width': 'label', 'height': 'label' });
                 }
             });
