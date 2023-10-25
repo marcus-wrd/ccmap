@@ -181,14 +181,13 @@
                         }
                     }
                 ],
-                layout: {
-                    name: 'cose',
-                    fit: true,
-                    padding: 10,
-                    animate: false,  // Turn off for large graphs for better performance
-                    nodeOverlap: 5,
-                    idealEdgeLength: 30  // Adjust to control edge lengths
-                }
+            layout: {
+                name: 'breadthfirst',
+                fit: true,
+                directed: true,
+                padding: 10,
+                spacingFactor: 0.3  // Adjust this value to find the desired edge length
+            }
             });
 
             cy.on('grab', 'node', function (event) {
