@@ -163,6 +163,15 @@
             });
 
             const graphData = await response.json();
+            
+            let graphNodes = graphData.nodes;
+            for(let i = 0; i < graphNodes.length; i++) {
+                let node = graphNodes[i];
+                node.data.label = node.data.id; // Use the original ID as the label
+                node.data.id = 'n' + nodeIdCounter++; // Assign a new unique ID
+            }
+
+            
             // A recursive function to color nodes and their descendants
             function colorDescendants(nodeId, color, edges, nodes, nodeColorMapping) {
                 // Find all edges where this node is the source
@@ -182,17 +191,21 @@
             }
             
             // In your sendMessage function:
-            let parentNode = graphData.nodes[0]; // Assuming the 1st node is the main node
+            // In your sendMessage function:
+            let parentNode = graphData.nodes.find(node => node.data.label === message); // Find the main node by label
+
             const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33FF", "#FF8333"]; // Example colors
             
             // Dictionary to store node-color mappings
             let nodeColorMapping = {};
             
             for (let i = 0; i < graphData.edges.length; i++) {
+                
                 let edge = graphData.edges[i];
             
                 // If this edge starts at the parent node
                 if (edge.data.source === parentNode.data.id) {
+
                     let color = colors[i % colors.length];
                     
                     // Color the edge and target node
