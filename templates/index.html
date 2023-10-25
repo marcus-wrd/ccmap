@@ -141,14 +141,18 @@
 
             // Render the concept map using Cytoscape.js
             const cy = cytoscape({
-                container: document.getElementById('cy'), // container to render in
+                container: document.getElementById('cy'),
                 elements: graphData,
                 style: [
                     {
                         selector: 'node',
                         style: {
+                            'shape': 'rectangle',
                             'background-color': '#666',
-                            'label': 'data(id)'
+                            'label': 'data(id)',
+                            'text-wrap': 'wrap',
+                            'text-max-width': '13ch',
+                            'font-size': '10.5px'
                         }
                     },
                     {
@@ -161,7 +165,13 @@
                             'curve-style': 'bezier'
                         }
                     }
-                ]
+                ],
+                layout: {
+                    name: 'breadthfirst',
+                    fit: true,
+                    directed: true,
+                    padding: 10
+                }
             });
 
             // Enable drag and drop functionality
