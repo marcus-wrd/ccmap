@@ -126,8 +126,8 @@
     </div>
     <button id="save-as-png">Save as PNG</button>
     <!-- Added buttons for manual addition of nodes and edges -->
-    <button onclick="addManualNode()">Add Manual Node</button>
-    <button onclick="addManualEdge()">Add Manual Edge</button>
+    <button id="addManualNode">Add Manual Node</button>
+    <button id="addManualEdge">Add Manual Edge</button>
     <script>
         // Function to resize textarea
         function resizeTextarea() {
@@ -288,7 +288,8 @@
                     });
                 }
             }
-    
+            document.getElementById('addManualEdge').addEventListener('click', addManualEdge)
+            document.getElementById('addManualNode').addEventListener('click', addManualNode)
             // Modified the dblclick event to fix the node label editing issue
             cy.on('dblclick', 'node', function(event){
                 const node = event.target;
