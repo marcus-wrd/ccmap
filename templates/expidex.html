@@ -354,14 +354,19 @@
                         onClickFunction: savePNG
                     }
                 ]
-            cy.contextMenus({
-                evtType: 'cxttap',
-                menuItems: mitems
-            });
-            cy.contextMenus({
-                evtType: 'dblclick',
-                menuItems: mitems
-            });
+            if (navigator.userAgentData.mobile) {
+                cy.contextMenus({
+                    evtType: 'dblclick',
+                    menuItems: mitems
+                });
+            }
+            else {
+                cy.contextMenus({
+                    evtType: 'cxttap',
+                    menuItems: mitems
+                });
+            }
+
             cy.on('grab', 'node', function (event) {
                 event.target.addClass('grabbing');
             });
