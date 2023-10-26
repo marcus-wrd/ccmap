@@ -4,9 +4,9 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "Nexa - Chat AI",
-    "short_name": "Nexa",
-    "description": "A chatbot AI",
+    "name": "NextMap",
+    "short_name": "NextMap",
+    "description": "A Concept-Map generating AI, with two breathtakingly simple layouts.",
     "icons": [
         {
             "src": "/static/icon-192x192.png",
