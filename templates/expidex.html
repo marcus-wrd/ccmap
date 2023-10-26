@@ -264,9 +264,7 @@
                 spacingFactor: 1.3  // Adjust this value to find the desired edge length
             }
             });
-            cy.contextMenus({
-                evtType: 'cxttap',
-                menuItems: [
+            mitems = [
                     {
                         id: 'delete-node',
                         content: 'Delete',
@@ -356,6 +354,13 @@
                         onClickFunction: savePNG
                     }
                 ]
+            cy.contextMenus({
+                evtType: 'cxttap',
+                menuItems: mitems
+            });
+            cy.contextMenus({
+                evtType: 'dblclick',
+                menuItems: mitems
             });
             cy.on('grab', 'node', function (event) {
                 event.target.addClass('grabbing');
