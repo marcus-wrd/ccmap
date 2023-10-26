@@ -428,7 +428,24 @@
             cy.on('shiftTap', 'node', function (evt) {
                 evt.target.selected(!evt.target.selected());
             });
+
             
+            cy.on('dblclick', 'node, edge', function(event) {
+                // Get the original event
+                const originalEvent = event.originalEvent;
+                
+                // Create a new right-click event
+                const rightClickEvent = new MouseEvent('contextmenu', {
+                    'view': window,
+                    'bubbles': true,
+                    'cancelable': false,
+                    'clientX': originalEvent.clientX,
+                    'clientY': originalEvent.clientY
+                });
+            
+                // Dispatch the right-click event on the original target
+                originalEvent.target.dispatchEvent(rightClickEvent);
+            });
 
             // Function to handle PNG export
             function savePNG() {
