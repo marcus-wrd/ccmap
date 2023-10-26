@@ -305,6 +305,20 @@
                         }
                     },
                     {
+                        id: 'rename-node',
+                        content: 'Change text',
+                        selector: 'node', // Context menu only for nodes
+                        onClickFunction: function (event) {
+                            const node = event.target;
+                            const oldLabel = node.data('label');
+                            const newLabel = prompt("Edit node label:", oldLabel);
+                            if (newLabel && newLabel !== oldLabel) {
+                                node.data('label', newLabel);
+                                node.style({ 'width': 'label', 'height': 'label' });
+                            }
+                        }
+                    },
+                    {
                         id: 'delete-edge',
                         content: 'Delete',
                         selector: 'edge', // Context menu only for edges
@@ -415,15 +429,6 @@
                 evt.target.selected(!evt.target.selected());
             });
             
-            cy.on('dblclick', 'node', function (evt) {
-                const node = evt.target;
-                const oldLabel = node.data('label');
-                const newLabel = prompt("Edit node label:", oldLabel);
-                if (newLabel && newLabel !== oldLabel) {
-                    node.data('label', newLabel);
-                    node.style({ 'width': 'label', 'height': 'label' });
-                }
-            });
 
             // Function to handle PNG export
             function savePNG() {
