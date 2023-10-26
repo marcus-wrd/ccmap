@@ -268,6 +268,52 @@
                 evtType: 'cxttap',
                 menuItems: [
                     {
+                        id: 'delete-node',
+                        content: 'Delete',
+                        selector: 'node', // Context menu only for nodes
+                        onClickFunction: function (event) {
+                            const target = event.target || event.cyTarget;
+                            target.connectedEdges().remove();
+                            target.remove();
+                        }
+                    },
+                    {
+                        id: 'link-to-node',
+                        content: 'Link to',
+                        selector: 'node', // Context menu only for nodes
+                        onClickFunction: function (event) {
+                            const sourceNode = event.target || event.cyTarget;
+                            const targetNodeId = prompt("Enter the label of the node to connect:");
+                            const targetNode = cy.getElementById(targetNodeId);
+                            if (targetNode && sourceNode.id() !== targetNodeId) {
+                                if (cy.$(`edge[source="${sourceNode.id()}"][target="${targetNodeId}"]`).length === 0) {
+                                    cy.add({
+                                        group: 'edges',
+                                        data: {
+                                            id: sourceNode.id() + "->" + targetNodeId,
+                                            source: sourceNode.id(),
+                                            target: targetNodeId,
+                                            color: sourceNode.data('color') || '#FF5733'  // Take the color from the source node or use a default color
+                                        }
+                                    });
+                                } else {
+                                    alert("Link already exists!");
+                                }
+                            } else {
+                                alert("Invalid node label!");
+                            }
+                        }
+                    },
+                    {
+                        id: 'delete-edge',
+                        content: 'Delete',
+                        selector: 'edge', // Context menu only for edges
+                        onClickFunction: function (event) {
+                            const target = event.target || event.cyTarget;
+                            target.remove();
+                        }
+                    },
+                    {
                         id: 'dagre',
                         content: 'dagre',
                         coreAsWell: true,
