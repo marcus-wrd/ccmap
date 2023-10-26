@@ -264,7 +264,39 @@
                 spacingFactor: 1.3  // Adjust this value to find the desired edge length
             }
             });
-
+            cy.contextMenus({
+                evtType: 'cxttap',
+                menuItems: [
+                    {
+                        id: 'dagre',
+                        content: 'dagre',
+                        coreAsWell: true,
+                        onClickFunction: function () {
+                            cy.layout({ name: 'dagre' }).run();
+                        }
+                    },
+                    {
+                        id: 'breadthfirst',
+                        content: 'breadthfirst',
+                        coreAsWell: true,
+                        onClickFunction: function () {
+                            cy.layout({ name: 'breadthfirst' }).run();
+                        }
+                    },
+                    {
+                        id: 'add-node',
+                        content: 'Add Node',
+                        coreAsWell: true,
+                        onClickFunction: addManualNode
+                    },
+                    {
+                        id: 'save',
+                        content: 'Save as PNG',
+                        coreAsWell: true,
+                        onClickFunction: savePNG
+                    }
+                ]
+            });
             cy.on('grab', 'node', function (event) {
                 event.target.addClass('grabbing');
             });
@@ -332,91 +364,6 @@
                     }
                 }
             }
-            cy.on('cxttap', 'node', function (evt) {
-                const node = evt.target;
-                cy.contextMenus({
-                    menuItems: [
-                        {
-                            id: 'change-text',
-                            content: 'Change text',
-                            selector: 'node',
-                            onClickFunction: function (event) {
-                                const node = event.target || event.cyTarget;
-                                const oldLabel = node.data('label');
-                                const newLabel = prompt("Edit node label:", oldLabel);
-                                if (newLabel && newLabel !== oldLabel) {
-                                    node.data('label', newLabel);
-                                    node.style({ 'width': 'label', 'height': 'label' });
-                                }
-                            }
-                        },
-                        {
-                            id: 'link-to',
-                            content: 'Link to',
-                            selector: 'node',
-                            coreAsWell: true,
-                            onClickFunction: function (event) {
-                                cy.edgehandles().start(node);
-                            }
-                        },
-                        {
-                            id: 'delete',
-                            content: 'Delete',
-                            selector: 'node',
-                            onClickFunction: function (event) {
-                                node.connectedEdges().remove();
-                                node.remove();
-                            }
-                        },
-                        {
-                            id: 'delete-edge',
-                            content: 'Delete',
-                            selector: 'edge',
-                            onClickFunction: function (event) {
-                                const edge = event.target || event.cyTarget;
-                                edge.remove();
-                            }
-                        }
-                    ]
-                });
-            });
-            
-            cy.on('cxttap', function (event) {
-                if (event.target === cy) {
-                    cy.contextMenus({
-                        menuItems: [
-                            {
-                                id: 'dagre',
-                                content: 'dagre',
-                                coreAsWell: true,
-                                onClickFunction: function () {
-                                    cy.layout({ name: 'dagre' }).run();
-                                }
-                            },
-                            {
-                                id: 'breadthfirst',
-                                content: 'breadthfirst',
-                                coreAsWell: true,
-                                onClickFunction: function () {
-                                    cy.layout({ name: 'breadthfirst' }).run();
-                                }
-                            },
-                            {
-                                id: 'add-node',
-                                content: 'Add Node',
-                                coreAsWell: true,
-                                onClickFunction: addManualNode
-                            },
-                            {
-                                id: 'save',
-                                content: 'Save as PNG',
-                                coreAsWell: true,
-                                onClickFunction: savePNG
-                            }
-                        ]
-                    });
-                }
-            });
             
             cy.on('shiftTap', 'node', function (evt) {
                 evt.target.selected(!evt.target.selected());
