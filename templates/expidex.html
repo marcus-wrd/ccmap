@@ -272,7 +272,45 @@
                 event.target.removeClass('grabbing');
             });
             
-
+            // New function to add manual nodes
+            function addManualNode() {
+                const nodeId = prompt("Enter a unique node ID:", "Edit me by double-clicking...");
+                if (nodeId && cy) {
+                    cy.add({
+                        group: 'nodes',
+                        data: { id: nodeId, label: nodeId, color: '#FF5733' }
+                    });
+                }
+            }
+            
+            // New function to add manual edges
+            function addManualEdge() {
+                const sourceNode = prompt("Enter the source node ID:");
+                const targetNode = prompt("Enter the target node ID:");
+                if (sourceNode && targetNode && cy) {
+                    cy.add({
+                        group: 'edges',
+                        data: {
+                            id: sourceNode + "->" + targetNode,
+                            source: sourceNode,
+                            target: targetNode,
+                            color: '#FF5733'
+                        }
+                    });
+                }
+            }
+            
+            function removeSelectedNode() {
+                if (cy) {
+                    const selectedNode = cy.$('node:selected');
+                    if (selectedNode.length) {
+                        selectedNode.connectedEdges().remove();
+                        selectedNode.remove();
+                    } else {
+                        alert("Select a node first to remove it!");
+                    }
+                }
+            }
             // Registering plugins for cytoscape
             cy.contextMenus({ // Add context menu options
                 menuItems: [
