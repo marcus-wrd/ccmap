@@ -15,6 +15,8 @@
     <!--<script src="../cytoscape.js/build/cytoscape.js"></script>-->
 
     <script src="https://unpkg.com/dagre@0.7.4/dist/dagre.js"></script>
+    <script src="https://unpkg.com/cytoscape-context-menus"></script>
+    <script src="https://unpkg.com/cytoscape-edgehandles"></script>
     <script src="https://cytoscape.org/cytoscape.js-dagre/cytoscape-dagre.js"></script>
     <style>
         body {
@@ -137,8 +139,6 @@
     </div>
     <!-- Save as PNG button -->
     <button id="save-as-png"><i class="fas fa-image"></i></button>
-    <script src="https://unpkg.com/cytoscape-context-menus"></script>
-    <script src="https://unpkg.com/cytoscape-edgehandles"></script>
     <script>
         // Function to resize textarea
         function resizeTextarea() {
@@ -274,10 +274,6 @@
             
 
             // Registering plugins for cytoscape
-            cytoscape.use(dagre);
-            cytoscape.use(cytoscapeContextMenus);
-            cytoscape.use(cytoscapeEdgehandles);
-    
             cy.contextMenus({ // Add context menu options
                 menuItems: [
                     {
