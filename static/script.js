@@ -1,5 +1,8 @@
-// Function to resize textarea
-function resizeTextarea() {
+function stfuncdoesntwork() {
+   console.log("teest");
+}
+
+document.getElementById('input-message').addEventListener('input', function() {
    const textarea = document.getElementById('input-message');
    textarea.style.height = 'auto';
    if (textarea.scrollHeight <= 90) { // Allowing it to expand up to 5 lines
@@ -7,7 +10,7 @@ function resizeTextarea() {
    } else {
       textarea.style.height = '90px'; // After 5 lines, restrict to 90px
    }
-}
+});
 
 let cy = null; // global cy variable
 async function sendMessage() {
@@ -18,6 +21,7 @@ async function sendMessage() {
 
    // Display the user's message
    const chatMessages = document.getElementById('chat-messages');
+   chatMessages.innerHTML = '';
    chatMessages.innerHTML += `<div class="message">User: ${message2}</div>`;
 
    const cyContainer = document.createElement('div');
@@ -190,7 +194,7 @@ async function sendMessage() {
    cy.cxtmenu({
       selector: 'core',
       commands: [{
-            content: 'dagre',
+            content: 'Concept map 1',
             select: function () {
                cy.layout({
                   name: 'dagre'
@@ -198,15 +202,28 @@ async function sendMessage() {
             }
          },
          {
-            content: 'breadthfirst',
+            content: 'Concept map 2',
             select: function () {
                cy.layout({
-                  name: 'breadthfirst'
+                 name: 'elk',
+                 elk: {
+                   zoomToFit: true,
+                   algorithm: 'mrtree',
+                   separateConnectedComponents: false,
+                 },
                }).run();
             }
          },
          {
-            content: 'Add Node',
+            content: 'Mind map',
+            select: function () {
+               cy.layout({
+                  name: 'fcose'
+               }).run();
+            }
+         },
+         {
+            content: 'Add node',
             select: addManualNode
          },
          {
@@ -304,8 +321,29 @@ async function sendMessage() {
       link.href = "data:image/png;base64," + png64;
       link.click();
    }
+   document.getElementById('regenerate-btn').style.display = 'block';
+   // Store the original message in the cy instance's data
+   cy.data('originalMessage', message);
 
 }
+
+document.getElementById('regenerate-btn').addEventListener('click', function() {
+      document.getElementById('chat-messages').innerHTML = '';
+      if (cy) {
+         // If cy is defined, get the original message from the cy instance
+         const originalMessage = cy.data('originalMessage');
+         if (originalMessage) {
+            // Set the value of the input element to the original message
+            document.getElementById('input-message').value = originalMessage;
+            // Call the sendMessage function
+            sendMessage();
+         } else {
+            alert('Original message not found.');
+         }
+      } else {
+         alert('Concept map not found.');
+      }
+});
 
 if ("serviceWorker" in navigator) {
    navigator.serviceWorker.register("static/generate-sw.js");
